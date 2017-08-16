@@ -72,10 +72,7 @@ class Actor {
       return false;
     }
 
-    if ((this.right > actor.left) && (this.left < actor.right) && (this.bottom > actor.top) && (this.top < actor.bottom)) {
-      return true;
-    } 
-    return false;
+    return this.right > actor.left && this.left < actor.right && this.bottom > actor.top && this.top < actor.bottom;
   }
 }
 
@@ -85,17 +82,15 @@ class Actor {
 
 class Level {
   constructor(grid = [], actors = []) {
-    this.grid = grid;
-    this.propertyGrid = grid;
-    this.actors = actors;
-    this.propertyActors = actors;
-    this.player = actors.find(function (el) {
-      if (el.type == 'player') {
+    this.grid = grid.slice();
+    this.actors = actors.slice();
+    this.player = actors.find(el => {
+      if (el.type === 'player') {
         return el;
       }
     });
     this.height = grid.length;
-    this.width = Math.max(...grid.reduce(function (memo, el) {
+    this.width = Math.max(...grid.reduce((memo, el) => {
       memo.push(el.length);
       return memo;
     }, [0]));
@@ -104,7 +99,7 @@ class Level {
   }
 
   isFinished() {
-    return (this.status !== null && this.finishDelay < 0);
+    return this.status !== null && this.finishDelay < 0;
   }
 
   actorAt(actor) {
@@ -141,24 +136,24 @@ class Level {
   }
 
   removeActor(actor) {
-    this.actors.splice(this.actors.findIndex(function (el) {
-      return el == actor;
+    this.actors.splice(this.actors.findIndex(el => {
+      return el === actor;
     }), 1);
   }
 
   noMoreActors(type) {
-    return (this.actors.find(function (el) {
-      return el.type == type;
+    return (this.actors.find(el => {
+      return el.type === type;
     }) === undefined);
   }
 
   playerTouched(type, actor = undefined) {
     if (this.status === null) {
-      if (type == 'lava' || type == 'fireball') {
+      if (type === 'lava' || type === 'fireball') {
         this.status = 'lost';
       }
 
-      if (type == 'coin' && actor.type == 'coin') {
+      if (type === 'coin' && actor.type === 'coin') {
         this.removeActor(actor);
           if (this.noMoreActors('coin')) {
           this.status = 'won';
@@ -174,7 +169,7 @@ class Level {
 
 class LevelParser {
   constructor(dictionary = {}) {
-    this.dictionary = dictionary;
+    this.dictionary = Object.create(dictionary);
   }
 
   actorFromSymbol(symbol) {
@@ -182,10 +177,10 @@ class LevelParser {
   }
 
   obstacleFromSymbol(symbol) {
-    if (symbol == 'x') {
+    if (symbol === 'x') {
       return 'wall';
     }
-    if (symbol == '!') {
+    if (symbol === '!') {
       return 'lava';
     }
   }
@@ -207,7 +202,7 @@ class LevelParser {
     for (let y = 0; y < plan.length; y++) {
       let line = plan[y].split('');
       for (let x = 0; x < line.length; x++) { 
-        if (typeof(this.dictionary[line[x]]) == 'function') {
+        if (typeof this.dictionary[line[x]] === 'function') {
           let actor = new this.dictionary[line[x]](new Vector(x, y));
           if (actor instanceof Actor) {
             actors.push(actor);
@@ -228,11 +223,8 @@ class LevelParser {
 
 
 class Fireball extends Actor {
-  constructor(pos = new Vector(), speed = new Vector()) {
-    super();
-    this.pos = pos;
-    this.speed = speed;
-    this.size = new Vector(1, 1);
+  constructor(pos, speed, size) {
+    super(pos, size, speed);
   }
 
   get type() {
@@ -262,9 +254,8 @@ class Fireball extends Actor {
 
 
 class HorizontalFireball extends Fireball {
-  constructor(pos) {
-    super(pos);
-    this.size = new Vector(1, 1);
+  constructor(pos, size) {
+    super(pos, size);
     this.speed = new Vector(2, 0);
   }
 }
@@ -274,9 +265,8 @@ class HorizontalFireball extends Fireball {
 
 
 class VerticalFireball extends Fireball {
-  constructor(pos) {
-    super(pos);
-    this.size = new Vector(1, 1);
+  constructor(pos, size) {
+    super(pos, size);
     this.speed = new Vector(0, 2);
   }
 }
@@ -286,9 +276,8 @@ class VerticalFireball extends Fireball {
 
 
 class FireRain extends Fireball {
-  constructor(pos) {
-    super(pos);
-    this.size = new Vector(1, 1);
+  constructor(pos, size) {
+    super(pos, size);
     this.speed = new Vector(0, 3);
     this.startPos = pos;
   }
