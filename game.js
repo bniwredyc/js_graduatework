@@ -90,10 +90,9 @@ class Level {
       }
     });
     this.height = grid.length;
-    this.width = Math.max(...grid.reduce((memo, el) => {
-      memo.push(el.length);
-      return memo;
-    }, [0]));
+    this.width = Math.max(0, ...grid.map((el) => {
+      return el.length;
+    }));
     this.status = null;
     this.finishDelay = 1;
   }
