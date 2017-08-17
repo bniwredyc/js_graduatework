@@ -129,7 +129,10 @@ class Level {
   }
 
   removeActor(actor) {
-    this.actors.splice(this.actors.findIndex(el => el === actor), 1);
+    let index = this.actors.findIndex(el => el === actor);
+    if (index !== -1) {
+      this.actors.splice(index, 1);
+    }
   }
 
   noMoreActors(type) {
