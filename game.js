@@ -48,19 +48,19 @@ class Actor {
   act() {}
 
   get left() {
-    return Math.min(this.pos.x, this.pos.x + this.size.x);
+    return this.pos.x;
   }
 
   get top() {
-    return Math.min(this.pos.y, this.pos.y + this.size.y);
+    return this.pos.y;
   }
 
   get right() {
-    return Math.max(this.pos.x + this.size.x, this.pos.x);
+    return this.pos.x + this.size.x;
   }
 
   get bottom() {
-    return Math.max(this.pos.y + this.size.y, this.pos.y);
+    return this.pos.y + this.size.y;
   }
 
   isIntersect(actor) {
@@ -108,10 +108,13 @@ class Level {
       throw new Error('Необходимо передать объект типа Vector');
     }
 
+    let left = Math.floor(position.y);
+    let top = Math.floor(position.x);
     let right = Math.ceil(position.y + size.y);
     let bottom = Math.ceil(position.x + size.x);
-    for (let y = Math.floor(position.y); y < right; y++) {
-      for (let x = Math.floor(position.x); x < bottom; x++) {
+
+    for (let y = left; y < right; y++) {
+      for (let x = top; x < bottom; x++) {
         if (x < 0 || x + size.x > this.width || y < 0) {
           return 'wall';
         }
@@ -151,7 +154,7 @@ class Level {
     if (type === 'coin' && actor.type === 'coin') {
       this.removeActor(actor);
         if (this.noMoreActors('coin')) {
-        this.status = 'won';
+          this.status = 'won';
       }
     }
   }
@@ -181,10 +184,8 @@ class LevelParser {
 
   createGrid(plan) {
     return plan.reduce((memo, el) => {
-      memo.push(el.split('').reduce((memo, el) => {
-        memo.push(this.obstacleFromSymbol(el));
-        return memo;
-      }, []));
+      const line = el.split('').map(el => this.obstacleFromSymbol(el));
+      memo.push(line);
       return memo;
     }, []);
   }
@@ -217,7 +218,7 @@ class LevelParser {
 
 class Fireball extends Actor {
   constructor(pos = new Vector(0, 0), speed = new Vector(0, 0)) {
-    let size = new Vector(1, 1);
+    const size = new Vector(1, 1);
     super(pos, size, speed);
   }
 
@@ -249,9 +250,8 @@ class Fireball extends Actor {
 
 class HorizontalFireball extends Fireball {
   constructor(pos) {
-    let speed = new Vector(2, 0);
+    const speed = new Vector(2, 0);
     super(pos, speed);
-    this.size = new Vector(1, 1);
   }
 }
 
@@ -261,9 +261,8 @@ class HorizontalFireball extends Fireball {
 
 class VerticalFireball extends Fireball {
   constructor(pos) {
-    let speed = new Vector(0, 2);
+    const speed = new Vector(0, 2);
     super(pos, speed);
-    this.size = new Vector(1, 1);
   }
 }
 
@@ -273,9 +272,8 @@ class VerticalFireball extends Fireball {
 
 class FireRain extends Fireball {
   constructor(pos) {
-    let speed = new Vector(0, 3);
+    const speed = new Vector(0, 3);
     super(pos, speed);
-    this.size = new Vector(1, 1);
     this.startPos = pos;
   }
 
@@ -290,8 +288,8 @@ class FireRain extends Fireball {
 
 class Coin extends Actor {
   constructor(position = new Vector(0, 0)) {
-    let pos = position.plus(new Vector(0.2, 0.1));
-    let size = new Vector(0.6, 0.6);
+    const pos = position.plus(new Vector(0.2, 0.1));
+    const size = new Vector(0.6, 0.6);
     super(pos, size);
     this.springSpeed = 8;
     this.springDist = 0.07;
@@ -326,9 +324,9 @@ class Coin extends Actor {
 
 class Player extends Actor {
   constructor(position = new Vector(0, 0)) {
-    let pos = position.plus(new Vector(0, -0.5));
-    let size = new Vector(0.8, 1.5);
-    let speed = new Vector(0, 0);
+    const pos = position.plus(new Vector(0, -0.5));
+    const size = new Vector(0.8, 1.5);
+    const speed = new Vector(0, 0);
     super(pos, size, speed);
   }
 
@@ -347,7 +345,7 @@ const actorDict = {
   '=': HorizontalFireball,
   '|': VerticalFireball,
   'v': FireRain
-}
+};
 
 const parser = new LevelParser(actorDict);
 
