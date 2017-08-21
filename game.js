@@ -96,7 +96,7 @@ class Level {
   }
 
   actorAt(actor) {
-    if (!(actor instanceof Actor) || actor === undefined) {
+    if (!(actor instanceof Actor)) {
       throw new Error('Необходимо передать объект типа Actor');
     }
 
