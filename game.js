@@ -192,11 +192,11 @@ class LevelParser {
   createActors(plan) {
     const actors = [];
     for (let y = 0; y < plan.length; y++) {
-      let line = plan[y].split('');
+      const line = plan[y].split('');
       for (let x = 0; x < line.length; x++) {
-        let symbol = this.dictionary[line[x]];
+        const symbol = this.dictionary[line[x]];
         if (typeof symbol === 'function') {
-          let actor = new symbol(new Vector(x, y));
+          const actor = new symbol(new Vector(x, y));
           if (actor instanceof Actor) {
             actors.push(actor);
           }
@@ -293,6 +293,7 @@ class Coin extends Actor {
     this.springSpeed = 8;
     this.springDist = 0.07;
     this.spring = Math.random() * Math.PI;
+    this.posBase = pos;
   }
 
   get type() {
@@ -309,7 +310,7 @@ class Coin extends Actor {
 
   getNextPosition(time = 1) {
     this.updateSpring(time);
-    return this.pos.plus(this.getSpringVector());
+    return this.posBase.plus(this.getSpringVector());
   }
 
   act(time) {
