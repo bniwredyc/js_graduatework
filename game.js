@@ -13,7 +13,7 @@ class Vector {
     return new Vector(this.x + vector.x, this.y + vector.y);
   }
 
-  times(factor) {
+  times(factor = 1) {
     return new Vector(this.x * factor, this.y * factor);
   }
 }
@@ -108,31 +108,30 @@ class Level {
       throw new Error('Необходимо передать объект типа Vector');
     }
 
-    let left = Math.floor(position.y);
-    let top = Math.floor(position.x);
-    let right = Math.ceil(position.y + size.y);
-    let bottom = Math.ceil(position.x + size.x);
+    const left = Math.floor(position.x);
+    const top = Math.floor(position.y);
+    const right = Math.ceil(position.x + size.x);
+    const bottom = Math.ceil(position.y + size.y);
 
-    for (let y = left; y < right; y++) {
-      for (let x = top; x < bottom; x++) {
-        if (x < 0 || x + size.x > this.width || y < 0) {
-          return 'wall';
-        }
+    if (left < 0 || right > this.width || top < 0) {
+      return 'wall';
+    }
 
-        if (y + size.y > this.height) {
-          return 'lava';
-        }
-        
-        if (this.grid[y][x] !== undefined) {
+    if (bottom > this.height) {
+      return 'lava';
+    }
+
+    for (let y = top; y < bottom; y++) {
+      for (let x = left; x < right; x++) {   
+        if (this.grid[y][x]) {
           return this.grid[y][x];
         }
       }
     }
-    return undefined;
   }
 
   removeActor(actor) {
-    let index = this.actors.findIndex(el => el === actor);
+    const index = this.actors.findIndex(el => el === actor);
     if (index !== -1) {
       this.actors.splice(index, 1);
     }
@@ -153,8 +152,8 @@ class Level {
 
     if (type === 'coin' && actor.type === 'coin') {
       this.removeActor(actor);
-        if (this.noMoreActors('coin')) {
-          this.status = 'won';
+      if (this.noMoreActors('coin')) {
+        this.status = 'won';
       }
     }
   }
@@ -191,7 +190,7 @@ class LevelParser {
   }
 
   createActors(plan) {
-    let actors = [];
+    const actors = [];
     for (let y = 0; y < plan.length; y++) {
       let line = plan[y].split('');
       for (let x = 0; x < line.length; x++) {
@@ -235,7 +234,7 @@ class Fireball extends Actor {
   }
 
   act(time, level) {
-    let nextPos = this.getNextPosition(time);
+    const nextPos = this.getNextPosition(time);
     if (!(level.obstacleAt(nextPos, this.size))) {
       this.pos = nextPos;
     } else {
@@ -249,7 +248,7 @@ class Fireball extends Actor {
 
 
 class HorizontalFireball extends Fireball {
-  constructor(pos) {
+  constructor(pos = new Vector(0, 0)) {
     const speed = new Vector(2, 0);
     super(pos, speed);
   }
@@ -260,7 +259,7 @@ class HorizontalFireball extends Fireball {
 
 
 class VerticalFireball extends Fireball {
-  constructor(pos) {
+  constructor(pos = new Vector(0, 0)) {
     const speed = new Vector(0, 2);
     super(pos, speed);
   }
@@ -271,7 +270,7 @@ class VerticalFireball extends Fireball {
 
 
 class FireRain extends Fireball {
-  constructor(pos) {
+  constructor(pos = new Vector(0, 0)) {
     const speed = new Vector(0, 3);
     super(pos, speed);
     this.startPos = pos;
